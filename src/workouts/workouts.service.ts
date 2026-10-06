@@ -19,10 +19,16 @@ export class WorkoutsService {
     };
   }
 
-  findAll() {
+  findAll(routineName?: string) {
+    let results = this.workouts;
+
+    if (routineName) {
+      results = this.workouts.filter((item) => item.routineName.includes(routineName));
+    }
+
     return {
-      totalCount: this.workouts.length,
-      items: this.workouts,
+      totalCount: results.length,
+      items: results,
     };
   }
 
@@ -31,10 +37,34 @@ export class WorkoutsService {
   }
 
   update(id: number, updateWorkoutDto: UpdateWorkoutDto) {
-    return `ID가 ${id}인 운동 기록을 수정합니다.`;
+    const index = this.workouts.findIndex((item) => item.id === id);
+    if (index === -1) {
+      return { message: `ID가 ${id}인 운동 기록을 찾을 수 없습니다.` };
+    }
+
+    this.workouts[index] = {
+      ...this.workouts[index],
+      ...updateWorkoutDto,
+    };
+
+    return {
+      message: `ID가 ${id}인 운동 기록이 성공적으로 수정되었습니다!`,
+      data: this.workouts[index],
+    };
   }
 
   remove(id: number) {
-    return `ID가 ${id}인 운동 기록을 삭제합니다.`;
+    const index = this.workouts.findIndex((item) => item.id === id);
+    if (index === -1) {
+      return { message: `ID가 ${id}인 운동 기록을 찾을 수 없습니다.` };
+    }
+
+    // 배열에서 해당 아이템 제거
+    const deletedItem = this.workouts.splice(index, 1);
+
+    return {
+      message: `ID가 ${id}인 운동 기록이 삭제되었습니다.`,
+      data: deletedItem[0],
+    };
   }
 }
